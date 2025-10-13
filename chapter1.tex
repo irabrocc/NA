@@ -1,0 +1,141 @@
+% 声明为子文件，指定主文件
+\documentclass[main.tex]{subfiles}
+
+\begin{document}
+\pagestyle{plain}
+
+\chapter{Introduction, Horner's Method}
+\label{chap:chapter1}
+\par Motivation: 
+\begin{itemize}
+    \item Sometimes problems require too much time, effort, etc. to be  praticallly solved wtih a computer. 
+    \item Some problems cannot be solved analytically. 
+    \item For applications, numerical solutions are often sufficient.  
+\end{itemize}
+\begin{example}
+    Can you solve :
+    \begin{enumerate}
+        \item $\sin(0.67)$
+        \item $\displaystyle \int_{0}^{1} e^{-x^2} \mathrm{d} x $
+        \item $x^2 - \sin(x) - 1 = 0, x = ?$
+    \end{enumerate}
+\end{example}
+\par Numerical problems lead to new mathematical questions. 
+\begin{example}
+    Suppose $Ax = b, A\in \mathbb{R}^{n \times n}, det(A)\neq 0$, and $A$ is symmetric. Find $det(A)$. 
+    \par Approach I: Use Sarrus' rule $det(A) = \sum_{\sigma \in S_n} sgn(\sigma) \prod_{i=1}^{n} a_{i, \sigma(i)}$. For each permutation $\sigma$, we have $n!$ permutations. So we have $n \cdot n!$ product operations. Furthermore, we have $n! - 1$ additions, meaning that the method requires $n(n!) + n! - 1$ operations. This approach works fine for small $n$, but not for large $n$. 
+    \par Approach II: Use the diagonalization method. Since $A$ is symmetric, we can find an orthogonal matrix $Q$ such that $Q^T A Q = D$, where $D$ is a diagonal matrix. Then, we have $det(A) = det(Q) det(D) = det(D)$. We can compute $det(A)$ in $cn^3 + n - 1$ operations where $c$ is a constant.
+\end{example}
+
+\begin{definition}
+    Consider sequences $(x_n)$ and $(\alpha_n)$, where $n = 0, 1, 2, \ldots$. We say that $(x_n)$ is in $O(\alpha_n)$ if there exist constants $C, N$ such that
+    \[
+        |x_n| \leq C |\alpha_n|, \quad \forall n \geq N
+    \]
+\end{definition}
+
+\begin{example}
+    $\dfrac{n + 1}{n^2}$ is in $O(\dfrac{1}{n})$. $Cn^3 + n - 1$ is in $O(n^3)$. $n(n!)$ is in $O(n(n!))$.
+\end{example}
+\par \noindent \textbf{Remark} It is also true that $Cn^3 + n - 1$ is in $O(n(n!))$. 
+
+\begin{definition}
+    Let $(x_n), (\alpha_n)$ be sequences, where $n = 0, 1, 2, \ldots$. We say that $(x_n)$ is in $\Theta(\alpha_n)$ if there exist constants $C_1, C_2, N$ such that
+    \[
+        C_1 |\alpha_n| \leq |x_n| \leq C_2 |\alpha_n|, \quad \forall n \geq N
+    \]
+\end{definition}
+
+\begin{example}
+    $n(n!) \le n(n!) + n! - 1 \le 2n(n!)$ for $n \geq 1$. So $n(n!) + n! - 1$ is in $\Theta(n(n!))$. 
+\end{example}
+
+\begin{example}
+    $Cn^3 \le Cn^3 + n - 1 \le (C+1) n^3$ for $n \geq 1$. So $Cn^3 + n - 1$ is in $\Theta(n^3)$. 
+\end{example}
+\par \noindent \textbf{Question} How many operations are required to evaluate a polynomial $p(z) = a_n z^n + a_{n-1} z^{n-1} + \cdots + a_1 z + a_0$ at a point $z_0$ where $a_n, a_{n-1}, \ldots, a_1, a_0, z_0 \in \mathbb{R}$? 
+\par The simplest approach computes $a_k z^k$ by using $k$ multiplications, and then sums them up. This requires $n + (n-1) + \cdots + 1 + n = \dfrac{n(n+1)}{2} + n $ which is in $\Theta(n^2)$. 
+\par The Horner's method is based on the remaider theorem, which reduce complexity of evaluation of a polynomial. It only requires $\Theta(n)$ operations.  
+\begin{theorem}[Horner's Method]
+    Let $p(z)$ be a polynomial of degree $n$, with real coefficients, and $z_0\in \mathbb{R}$. Then there exists $r\in \mathbb{R}$ and a polynomial $q(z)$ of degree $n-1$ such that
+    \[
+        p(z) = r + (z - z_0) q(z)
+    \]
+\end{theorem}
+
+\par \noindent \textbf{Proof. } Let $p(z) = a_n z^n + a_{n-1} z^{n-1} + \cdots + a_1 z + a_0$. Our goal is to find coefficients $b_{n-1}, b_{n-2}, \ldots, b_1, b_0$ and a constant $r$ such that 
+\[
+    p(z) = r + (z - z_0)(b_{n-1} z^{n-1} + b_{n-2} z^{n-2} + \cdots + b_1 z + b_0)
+\]
+\par Equating coefficients of like powers of $z$ on both sides, we get a system of equations:
+\begin{align*}
+    a_n &= b_{n-1} \\
+    a_{n-1} &= b_{n-2} - z_0 b_{n-1} \\
+    a_{n-2} &= b_{n-3} - z_0 b_{n-2} \\
+    &\vdots \\
+    a_1 &= b_0 - z_0 b_1 \\
+    a_0 &= r - z_0 b_0
+\end{align*}
+Solving the equations from the top the the bottom recursively leads to a unique solution: 
+\begin{align*}
+    b_{n-1} &= a_n \\
+    b_{n-2} &= a_{n-1} + z_0 b_{n-1} \\
+    b_{n-3} &= a_{n-2} + z_0 b_{n-2} \\
+    &\vdots \\
+    b_0 &= a_1 + z_0 b_1 \\
+    r &= a_0 + z_0 b_0
+\end{align*}
+\\ \null \hfill $\blacksquare$ 
+
+\par \noindent \textbf{Remark. } It is convenient to write $b_{-1} = r$ which leads to equations 
+\[
+    b_{n - 1} = a_n
+\]
+\[
+    a_k = b_{k-1} - z_0 b_k, \quad k = n-1, \ldots, 0
+\]
+These equations can be graphically represented as: 
+\[
+    \begin{array}{ccccccccccc}
+        \null &  |  & a_n &     & a_{n-1} &     & a_{n-2} & \cdots & a_1 &     & a_0 \\
+        \null &  |  & \null &         & \null &         &        &     & \null &     \\
+        z_0&  |  &    &     & -z_0 b_{n-1} &     & -z_0 b_{n-2} & \cdots & -z_0 b_1 &     & -z_0 b_0 \\
+        \null &  |  & \null &         & \null &         &        &     & \null &     \\
+        \hline 
+        \null &    &b_{n-1} &     & b_{n-2} &     & b_{n-3} & \cdots & b_0 &     & b_{-1} \\
+    \end{array}
+\]
+
+\par \noindent \textbf{Remark} We have $n$ equations, each of which requires one addition and one multiplication. Overall complexity of computing $p(z_0)$ is in $\Theta (n)$. 
+
+\par \noindent \textbf{Remark} The algorithm can be used for finding all roots of $p(z)$ by starting with a root $z_0$, then writing $p(z) = (z - z_0)q(z)$, and finding $z_1$ and etc. We will later learn how to find these roots and how to apply the algorithm. 
+
+\par \noindent \textbf{Remark} Note that $p'(z) = q(z) + (z - z_0)q'(z)$, so $p'(z_0) = q(z_0)$ which can be evaluated by Horner again. 
+\begin{example}
+    Let $p(z) = z^4 - 4z^3 + 7z^2 - 5z -2$. We compute $p(3)$ and $p'(3)$. 
+\end{example}
+\par We set up the following table:
+\[
+    \begin{array}{ccccccccccc}
+        \null &  |  & 1 &     & -4 &     & 7 &     & -5 &     & -2 \\
+        \null &  |  & \null &         & \null &         & \null &     & \null &     \\
+        3&  |  &    &     & 3 &     & -3 &     & 12 &     & 21 \\
+        \null &  |  & \null &         & \null &         & \null &     & \null &     \\
+        \hline 
+        \null &    &1 &     & -1&     & 4&     & 7&     & 19 \\
+    \end{array}
+\]
+So we have $p(3) = r = 19$. Then we set up the following table to compute $p'(3) = q(3)$:
+\[
+    \begin{array}{ccccccccc}
+        \null &  |  & 1 &     & -1 &     & 4 &     & 7 \\
+        \null &  |  & \null &         & \null &         & \null &     \\
+        3&  |  &    &     & 3 &     & 6 &     & 30 \\
+        \null &  |  & \null &         & \null &         & \null &     \\
+        \hline 
+        \null &    &1 &     & 2&     & 10&     & 37 \\
+    \end{array}
+\]
+So we have $p'(3) = q(3) = 37$. 
+
+\end{document}
