@@ -1,0 +1,128 @@
+% 声明为子文件，指定主文件
+\documentclass[main.tex]{subfiles}
+
+\begin{document}
+\pagestyle{plain}
+\setcounter{chapter}{1}
+\chapter{Floating point numbers. Convergence. Bisection method. [Section 1.2]}
+\label{chap:chapter1}
+\subsection{Round-off errors and Computer arithmetic}
+\par \noindent \textbf{Remark:}Computer don't operate with real numbers!
+\par \noindent \textbf{Representations of decimal numbers(rational)}. 
+\begin{enumerate}
+    \item \textbf{Fixed Point} Let $d_k = \{0, 1, \cdots, 9\}$ Then we can represent a decimal number as
+    \begin{equation}
+        x = (d_5d_4d_3d_2d_1d_0.d_{-1}d_{-2}d_{-3}d_{-4}d_{-5}) = \sum_{k=-5}^{5} d_k 10^k
+    \end{equation}
+    , where $m< 0 \le M$. Similarly, for binary numbers: 
+    \begin{equation}
+        x = b_M b_{M-1} \cdots b_1 b_0 . b_{-1} b_{-2} \cdots b_{m} = \sum_{k=m}^{M} b_k 2^k, \quad b_k \in \{0, 1\}
+    \end{equation}
+    This is called the fixed-point representation. However, it's inconvenient for large numbers, or ones with many decimals, so it is rarely used(nowadays). 
+    \item \textbf{Floating Point} Idea: represent the number as an integer scaled by an exponent of a fixed base. 
+    \begin{equation}
+        12.345 = (1)12345 \times 10^{-3}
+    \end{equation}
+    where $(1)$ is the sign bit, $12345$ is the significand(mantissa), $10$ is the base, and $-3$ is the exponent. 
+    \par \noindent \textbf{Remark} Base $10$ corresponds to the "scientific notation used in calculators. Computers(usually) use base $2$. 
+    \par \noindent \textbf{Remark} The common type of floating point representation follows the IEEE 754 standard. 
+    \begin{enumerate}
+        \item \textbf{Single precision} (binary 32, called float in C) 32 bits, mantisa 24 bits(approximately 7 decimal digits). 
+        \item \textbf{Double precision} (binary 64, called double in C) 64 bits, mantisa 53 bits(approximately 16 decimal digits). 
+    \end{enumerate}
+\end{enumerate}
+
+\begin{example}
+    The first $33$ bits of $\pi$ in binary is
+    \begin{equation}
+        \pi = 110010010000111111011010101000100
+    \end{equation}
+    To write this as a single precision floating point number, take the 24 bit rounding approximation 
+    \begin{equation}
+        110010010000111111011011 = (1\times 2^0 + 1\times 2^{-1} + 0\times 2^{-2} + \cdots + 1\times 2^{-23})\times 2^1 \approx 3.1415928
+    \end{equation}
+    where the last bit is rounded up and the exponent is $1$.  
+\end{example}
+\par \textbf{Machine epsilon}(or machine precision) is an best bound for relative approximation error due to the floating point arithmetic. 
+\par The standard values of machine epsilon are
+\begin{itemize}
+    \item binary 32(single precision): $\epsilon \approx 1.19 \times 10^{-7}$
+    \item binary 64(double precision): $\epsilon \approx 2.22 \times 10^{-16}$
+\end{itemize}
+\par This value is contained in the module numpy of python (import numpy as np) 
+\begin{lstlisting}[language = Python]
+    import numpy as np
+    print(np.finfo(float).eps)
+    # 2.220446049250313e-16
+    print(np.finfo(np.float32).eps)
+    # 1.1920929e-07
+\end{lstlisting}
+\par \noindent \textbf{Remark} 
+\begin{enumerate}
+    \item "Machine epsilon accuracy" is the ultimate standard for numerical algorithms. (no better accuracy can be expected)
+    \item Accuracy within $3$ or 4 decimals from the machine epsilon is already very sufficient and more than that cannot be expected in practice. 
+\end{enumerate}
+
+\begin{definition}
+    Suppose $p*$ is an approximation of $p\in \mathbb{R}$. Then 
+    \begin{enumerate}
+        \item The \textbf{actual error} is $p - p*$;
+        \item The \textbf{absolute error} is $|p - p*|$;
+        \item The \textbf{relative error} is $\dfrac{|p - p*|}{|p|}$, provided $p\neq 0$.
+    \end{enumerate}
+    The number $p*$ is said to approximate $p\neq 0$ to $t$ significant digits if $t$ is the largest non-negative integer such that 
+    \begin{equation}
+        \dfrac{|p - p*|}{|p|} < 5 \times 10^{-t} 
+    \end{equation} 
+\end{definition}
+
+\begin{definition}[Floating Point Arithmetic]
+    Denote by $fl(x)$ the floating point approximation of $x$. Then 
+\begin{equation}
+    x \oplus y = fl(fl(x) + fl(y))
+\end{equation}
+\begin{equation}
+    x \otimes y = fl(fl(x) \cdot fl(y))
+\end{equation}
+\begin{equation}
+    x \ominus y = fl(fl(x) - fl(y)) 
+\end{equation}
+\end{definition}
+\subsection{Convergence}
+\begin{definition}[Rates of Convergence]
+    Suppose $(\alpha_n), n = 0, 1, 2, \cdots $ is a sequence of real numbers such that $\lim_{n\to \infty} \alpha_n = \alpha\in \mathbb{R}$ and $(\beta_n)$ is a sequence such that $\lim_{n\to \infty} \beta_n = 0$. If there exist $K>0, N\ge 0$ such that $|\alpha_n - \alpha| \le K |\beta_n|$ for all $n \ge N$, then we say that $(\alpha_n)$ converges to $\alpha$ with rate $O(\beta_n)$. 
+\end{definition}
+
+\par \noindent \textbf{Remark} Usually $\beta_n = \dfrac{1}{n^p}$ for some $p>0$. 
+\subsection{Bisection method}
+\par Recall: Intermediate Value Theorem(Bolzano's theorem): Suppose $f:[a, b] \rightarrow \mathbb{R}$ is continuous, and there exists $K$ such that either $K\in (f(a), f(b))$ if $f(a) < f(b)$ or $K\in (f(b), f(a))$ if $f(a) > f(b)$. Then there exists $c\in (a, b)$ such that $f(c) = K$. As a corollary, if $f(a)f(b)<0$, then there exists $c\in (a, b)$ such that $f(c) = 0$. 
+\par \noindent \textbf{Application} Finding an interval $[a, b]$ that contains a solution of $x - 2^{-x} = 0$. For $x = 0, f(0) = -1 < 0$. For $x = 1, f(1) = 0.5 > 0$. So by the corollary there exists $c\in (0, 1)$ such that $f(c) = 0$.
+\par The following is an more advanced application. 
+\begin{algorithm}[Bisection Method]
+    Let $f:[a, b] \rightarrow \mathbb{R}$ be continuous and suppose that $f(a)f(b) < 0$. Then
+    \begin{enumerate}
+        \item Set $n = 1, a_1 = a, b_1 = b$.
+        \item Compute $c_n = \dfrac{a_n + b_n}{2}$. If $f(c_n) = 0$, stop. Otherwise, go to step 3.
+        \item If $f(a_n)f(c_n) < 0$, set $a_{n+1} = a_n, b_{n+1} = c_n$. If $f(b_n)f(c_n) < 0$, set $a_{n+1} = c_n, b_{n+1} = b_n$. Increment $n$ by $1$ and go to step 2.
+    \end{enumerate}
+\end{algorithm}
+
+\begin{example}
+    Let $f(x) = \cos(x) - 2x, [a, b] = [-8, 10]$. Then $f(-8) > 0, f(10) < 0$. So we can apply the bisection method.
+\end{example}
+\begin{theorem}
+    Suppose $f\in C([a, b])$ and $f(a) f(b) < 0$. Then the sequence $(c_n)$ generated by the bisection method approximates the zero $p\in (a, b)$ of $f$ with  
+    \begin{equation}
+        |c_n - p| \le \dfrac{b - a}{2^{n}}, n \ge 1 
+    \end{equation}
+\end{theorem}
+\par \noindent \textbf{Proof} Let $n \ge 1$. Then $b_n - a_n = \dfrac{b - a}{2^{n-1}}$ and $p\in (a_n, b_n)$ where $a_n, b_n$ are the endpoints of the interval at the $n$-th step. Because $c_n = \dfrac{a_n + b_n}{2}$, it follows that
+\begin{equation}
+    |c_n - p| \le \dfrac{b_n - a_n}{2} = \dfrac{b - a}{2^n} \to 0  
+\end{equation}
+as $n\to \infty$. 
+\\ \null \hfill $\blacksquare$ 
+
+\par \noindent \textbf{Remark} As $|p_n - p| \le (b - a) 2^{-n}$. So the convergence converges with the rate $O(2^{-n})$. Note: Here we can take $K = b - a$.
+\par \noindent \textbf{Remark} To avoid taking off points by graders, we're expected to show(at lest state) the conditions of the theorems we use. For example we need to say $K = b - a $ as the previous proof of the theorem.    
+\end{document}
