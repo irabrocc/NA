@@ -5,7 +5,7 @@
 \pagestyle{plain}
 \setcounter{chapter}{1}
 \chapter{Floating point numbers. Convergence. Bisection method. [Section 1.2]}
-\label{chap:chapter1}
+\label{chap:chapter2}
 \subsection{Round-off errors and Computer arithmetic}
 \par \noindent \textbf{Remark:}Computer don't operate with real numbers!
 \par \noindent \textbf{Representations of decimal numbers(rational)}. 
@@ -87,6 +87,9 @@
 \begin{equation}
     x \ominus y = fl(fl(x) - fl(y)) 
 \end{equation}
+\begin{equation}
+    x \oslash y = fl\left(\dfrac{fl(x)}{fl(y)}\right), \quad y\neq 0 
+\end{equation}
 \end{definition}
 \subsection{Convergence}
 \begin{definition}[Rates of Convergence]
@@ -124,5 +127,5 @@ as $n\to \infty$.
 \\ \null \hfill $\blacksquare$ 
 
 \par \noindent \textbf{Remark} As $|p_n - p| \le (b - a) 2^{-n}$. So the convergence converges with the rate $O(2^{-n})$. Note: Here we can take $K = b - a$.
-\par \noindent \textbf{Remark} To avoid taking off points by graders, we're expected to show(at lest state) the conditions of the theorems we use. For example we need to say $K = b - a $ as the previous proof of the theorem.    
+\par \noindent \textbf{Remark} To avoid taking off points by graders, we're expected to show(at lest state) the conditions of the theorems we use. For example we need to say $K = b - a $ as in the previous proof of the theorem. 
 \end{document}

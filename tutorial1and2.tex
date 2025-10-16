@@ -1,0 +1,98 @@
+% 声明为子文件，指定主文件
+\documentclass[main.tex]{subfiles}
+
+\begin{document}
+\pagestyle{plain}
+\setcounter{chapter}{2}
+
+\chapter{Tutorial For the first two classes}
+\label{chap:chapter3}
+\subsection{Horner's method}
+\par Notice that the notation in the tutorial differs from that in the lecture. For example, the index of the coefficients of $q$ starts from $1$ in the tutorial, but from $0$ in the lecture. 
+
+\par Another use of the Horner's method is for division of polynomials of degree $n\ge 1$ by first order polynomials in the form $(x - x_0)$. This application is based on the next result. 
+
+\begin{theorem}
+    [Polynomial remainder theorem]
+    Let $p(x)$ be polynomial of degree $n \ge 1$ and let $x_0\in \mathbb{R}$. Then the remainder of the division of $p(x)$ by $(x - x_0)$ is $p(x_0)$.  
+\end{theorem}
+\par The combination of this theorem with the Horner's method theorem gives that $q(x)$ is the quotient of the division of $p(x)$ by $(x - x_0)$. 
+
+\par \noindent \textbf{Exercise} Divide $x^3 - 6x^2 + 11x - 6$ by $(x - 2)$.
+
+\par \noindent \textbf{Solution} We need to compute the quotient $q(x)$ and the remainder $p(2)$. 
+$$
+\begin{array}{cccccc}
+    \null & | & 1 & -6 & 11 & -6 \\
+    \null & | & \null &     &     &     \\
+    2 & | &   & 2 & -8 & 6 \\
+    \hline
+    \null &   & 1 & -4 & 3 & 0 \\   
+\end{array}
+$$
+\par Therefore, $q(x) = x^2 - 4x + 3$ and $p(2) = 0$. 
+\subsection{Decimal machine numbers Floating-point numbers}
+\par A k-digit decimal machine number is a number of the form 
+\begin{equation}
+    \pm (0.d_1 d_2 d_3 \cdots d_k) \times 10^n
+\end{equation}
+where $d_i$ are decimal digits ($1 \leq d_1 \leq 9$ and $0 \leq d_i \leq 9$ for $i \geq 2$) and $n$ is an integer. Any positive number admits the so-called normalized representation in this form
+\begin{equation}
+    (0.d_1 d_2 d_3 \cdots d_k d_{k + 1} d_{k + 2} \cdots) \times 10^n, \quad 1 \leq d_1 \leq 9, \quad 0 \leq d_i \leq 9, i \geq 2, \quad n \in \mathbb{Z}
+\end{equation}
+The k-digit floating-point representation of the number $y$ is denoted by $fl(y)$ and it is obtained by terminating the representation of $y$ at $k$ digits. There are two common ways of doing this. 
+
+\begin{enumerate}
+    \item[(a)] By chopping: we chop off the digits $d_{k+1}, d_{k+2}, \ldots$. Then $fl(y) = (0.d_1 d_2 \cdots d_k) \times 10^n$.
+    \item[(b)] By rounding: we add $5 \times 10^{n - k - 1}$ to $y$ and then chop off the digits $d_{k+1}, d_{k+2}, \ldots$ to obtain the form 
+    $fl(y) = (0.\delta_1 \delta_2 \cdots \delta_k) \times 10^n$.
+\end{enumerate}
+\par Notice that for rounding when $d_{k + 1} \ge 5$, we add $1$ to $d_k$ and obtain $fl(y)$ and when $d_{k + 1} < 5$, we have $\delta_i = d_i$ for $i = 1, 2, \ldots, k$. 
+
+\par \noindent \textbf{Exercise} Determine the five-digits (a) chopping and (b) rounding values of the number $\pi$. 
+\par \noindent \textbf{Solution} First, we write $\pi$ in a normalized decimal form as $\pi = (0.314159265\cdots) \times 10^1$. Here, $n = 1$ and $k = 5$. 
+\begin{enumerate}
+    \item [(a)] By chopping, we have $fl(\pi) = (0.31415) \times 10^1 = 3.1415$.
+    \item [(b)] By rounding: First, we compute $\pi + 5 \times 10^{1 - 5 - 1} = \pi + 0.00005 = 3.14159265\cdots + 0.00005 = 3.14164\cdots$ = $(0.314164\cdots) \times 10^1$. Then, by chopping at $d_6$, we have $fl(\pi) = (0.31416) \times 10^1 = 3.1416$.
+\end{enumerate}
+\subsection{Operations with floating point numbers}
+\par One common error-producing calculations involves the cancellation of significant digits due to the substraction of nearly equal number. Let $x$ and $y$ be two nearly equal numbers given by 
+\begin{equation}
+    x = 0.d_1 d_2 d_3 \cdots d_p \alpha_{p+1} \alpha_{p+2} \cdots \times 10^n
+\end{equation}
+\begin{equation}
+    y = 0.d_1 d_2 d_3 \cdots d_p \beta_{p+1} \beta_{p+2} \cdots \times 10^n
+\end{equation}
+\par Let $k >p$. Then the $k$-digits representation for $x$ and $y$, for chopping for example, are 
+\begin{equation}
+    fl(x) = 0.d_1 d_2 d_3 \cdots d_p \alpha_{p+1} \alpha_{p+2} \cdots \alpha_{k} \times 10^n
+\end{equation}
+\begin{equation}
+    fl(y) = 0.d_1 d_2 d_3 \cdots d_p \beta_{p+1} \beta_{p+2} \cdots \beta_{k} \times 10^n
+\end{equation}
+then $fl(x) - fl(y)= 0.\delta_{p+1} \delta_{p+2} \cdots \delta_k \times 10^{n - p}$ where $\delta_{p+1}\delta_{p+2} \cdots \delta_k = \alpha_{p+1} \alpha_{p+2} \cdots \alpha_k - \beta_{p+1} \beta_{p+2} \cdots \beta_k$. 
+
+\par Notice that $fl(x) - fl(y)$ has at most $k - p$ significant digits. So maybe we are loosing information in the substraction operation. 
+
+\par \noindent \textbf{Exercise} Compute the solutions to $x^2 + 62.10 x + 1 = 0$. 
+
+\par \noindent \textbf{Solution} We solve the floating point solution by the quadratic formula: 
+
+\begin{equation}
+    fl(x_1) = \dfrac{-62.10 + \sqrt{(62.10)^2 - 4.000\times 1.000\times 1.000}}{2.000\times 1.000} = \dfrac{-62.10 + \sqrt{3852}}{2.000} = \dfrac{-62.10 + 62.06}{2.000} = -0.0200
+\end{equation}
+By using exact arithmetic, we get $x_1 = -0.01610723$. Similarly, we have that $f(x_2) = -62.10$ and $x_2 = -62.08390$. Notice that the relative errors are 
+\begin{equation}
+    e_1 = \dfrac{|-0.0200 + 0.01610723|}{|-0.01610723|} \approx 0.241678 \approx 2 \times 10^{-1}
+\end{equation}
+\begin{equation}
+    e_2 = \dfrac{|x_2 - fl(x_2)|}{|x_2|}\approx 0.000259 \approx 2 \times 10^{-4}
+\end{equation} 
+
+\par We can improve the approximation of $x_1$ by simply doing this: 
+\begin{equation}
+x_1 = \dfrac{-b + \sqrt{b^2 - 4ac}}{2a} \cdot \dfrac{-b - \sqrt{b^2 - 4ac}}{-b - \sqrt{b^2 - 4ac}} = \dfrac{-2c}{b + \sqrt{b^2 - 4ac}} 
+\end{equation}
+\par Please, compute $x_1$ from the above formula and examine the relative error.  
+
+\end{document}
