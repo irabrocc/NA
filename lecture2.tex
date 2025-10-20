@@ -5,7 +5,7 @@
 \pagestyle{plain}
 \setcounter{chapter}{1}
 \chapter{Floating point numbers. Convergence. Bisection method. [Section 1.2]}
-\label{chap:chapter2}
+\label{chap:lecture2}
 \subsection{Round-off errors and Computer arithmetic}
 \par \noindent \textbf{Remark:}Computer don't operate with real numbers!
 \par \noindent \textbf{Representations of decimal numbers(rational)}. 
@@ -72,9 +72,10 @@
     \end{enumerate}
     The number $p*$ is said to approximate $p\neq 0$ to $t$ significant digits if $t$ is the largest non-negative integer such that 
     \begin{equation}
-        \dfrac{|p - p*|}{|p|} < 5 \times 10^{-t} 
+        \dfrac{|p - p*|}{|p|} \le 5 \times 10^{-t} 
     \end{equation} 
 \end{definition}
+\par \noindent \textbf{Remark} It seems that there is a typo in the lecture note where it mistakes $\le$ for $<$ in the definition above. We have modified it. 
 
 \begin{definition}[Floating Point Arithmetic]
     Denote by $fl(x)$ the floating point approximation of $x$. Then 
